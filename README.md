@@ -40,3 +40,10 @@ service docker start
 usermod -a -G docker ec2-user
 
 Close the terminal and restart
+
+
+cp /home/ec2-user/environment/target/DSALRest-0.0.1-SNAPSHOT.jar .
+ docker container -d -name=newsample -p 8082:8080 sshaik/dockersample:latest 
+ mv DSALRest-0.0.1-SNAPSHOT.jar  app.jar
+ docker build -t sshaik/dockersample .
+ docker container run -it -p 8080:8080 sshaik/dockersample:latest
