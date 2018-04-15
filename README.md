@@ -47,3 +47,7 @@ cp /home/ec2-user/environment/target/DSALRest-0.0.1-SNAPSHOT.jar .
  mv DSALRest-0.0.1-SNAPSHOT.jar  app.jar
  docker build -t sshaik/dockersample .
  docker container run -it -p 8080:8080 sshaik/dockersample:latest
+
+
+Setting up the AWS access 
+https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html
