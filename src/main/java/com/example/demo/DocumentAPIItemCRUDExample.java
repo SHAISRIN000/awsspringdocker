@@ -4,13 +4,16 @@ package com.example.demo;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.UUID;
 
-import com.amazonaws.client.builder.AwsClientBuilder;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
+
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -37,9 +40,9 @@ public class DocumentAPIItemCRUDExample {
 
     public static void main(String[] args) throws IOException {
 
-        createItems();
+        createItems(null);
 
-        retrieveItem();
+        retrieveItem("4c6a2cf3-5439-47aa-b2d9-60773b58eb65");
 
         // Perform various updates.
 //        updateMultipleAttributes();
@@ -51,51 +54,49 @@ public class DocumentAPIItemCRUDExample {
 
     }
 
-    private static void createItems() {
+    public static void createItems(String json) {
+    	Table table = dynamoDB.getTable(tableName);
+        
+    	try {
+    	JsonParser parser = new JsonFactory().createJsonParser(json);
 
-        Table table = dynamoDB.getTable(tableName);
-        try {
+          JsonNode rootNode = new ObjectMapper().readTree(parser);
+       
+          ObjectNode currentNode;
+          currentNode =(ObjectNode) rootNode;
 
-        	  Item item = new Item().withPrimaryKey("reportId", UUID.randomUUID().toString())
-        			  .withString("source", "DSAL")
-        			  .withString("requestor", "PLPC")
-                      .withString("createTS",new Timestamp(System.currentTimeMillis()).toString())
-                      .withString("report", "{\n\"address\": {\n\"addressLine1\": \"5201 Brookside Dr\",\n\"addressLine2\": \" \",\n\"city\": \"Madison\",\n\"state\": \"WI\",\n\"zipcode\": \"53718\"\n},\n\"elements\": [\n{\n\"key\": \"numberOfStories\",\n\"value\": \"3+\",\n\"image\": \"/images/9e95f141-08dd-46c1-aa0a-7218bf1976ab_png\",\n\"confidence\": \"99\"\n}\n]\n}");
-              
-        	  table.putItem(item);
+//              int year = currentNode.path("year").asInt();
+//              String title = currentNode.path("title").asText();
+
+              try {
+                  table.putItem(new Item().withPrimaryKey("reportId", UUID.randomUUID().toString()).withString("report",
+                      currentNode.toString())
+            	  .withString("source", "DSAL")
+    			  .withString("requestor", "PLPC")
+                  .withString("createTS",new Timestamp(System.currentTimeMillis()).toString()));
                   
-                  
-        /*    Item item = new Item().withPrimaryKey("Id", 120).withString("Title", "Book 120 Title")
-                .withString("ISBN", "120-1111111111")
-                .withStringSet("Authors", new HashSet<String>(Arrays.asList("Author12", "Author22")))
-                .withNumber("Price", 20).withString("Dimensions", "8.5x11.0x.75").withNumber("PageCount", 500)
-                .withBoolean("InPublication", false).withString("ProductCategory", "Book");
-            table.putItem(item);
+            	//  table.putItem(item);
+         
+              }
+              catch (Exception e) {
+                  System.err.println("Create items failed.");
+                  System.err.println(e.getMessage());
 
-            item = new Item().withPrimaryKey("Id", 121).withString("Title", "Book 121 Title")
-                .withString("ISBN", "121-1111111111")
-                .withStringSet("Authors", new HashSet<String>(Arrays.asList("Author21", "Author 22")))
-                .withNumber("Price", 20).withString("Dimensions", "8.5x11.0x.75").withNumber("PageCount", 500)
-                .withBoolean("InPublication", true).withString("ProductCategory", "Book");
-            table.putItem(item);*/
-
-        }
-        catch (Exception e) {
-            System.err.println("Create items failed.");
-            System.err.println(e.getMessage());
-
-        }
+                   }
+          
+          parser.close();
+    	}catch(Exception e) {
+    		System.err.println("Error in Parsing the JSON");
+    	}
+    	
     }
 
-    private static void retrieveItem() {
+    public static String retrieveItem(String reportId) {
         Table table = dynamoDB.getTable(tableName);
-        
-
-      
-
+        String reportJson=null;
         try {
 
-        	  GetItemSpec spec = new GetItemSpec().withPrimaryKey("reportId", "100");
+        	  GetItemSpec spec = new GetItemSpec().withPrimaryKey("reportId", reportId);
         	  Item item = table.getItem(spec);
               
 System.out.println(item.getJSONPretty("report"));
@@ -103,16 +104,18 @@ System.out.println(item.getJSONPretty("report"));
 
             System.out.println("Printing item after retrieving it....");
             System.out.println(item.toJSONPretty());
+            reportJson= item.toJSONPretty();
 
         }
         catch (Exception e) {
             System.err.println("GetItem failed.");
             System.err.println(e.getMessage());
         }
+        return reportJson;
 
     }
 
-    private static void updateAddNewAttribute() {
+    public static void updateAddNewAttribute() {
         Table table = dynamoDB.getTable(tableName);
 
         try {
@@ -134,7 +137,7 @@ System.out.println(item.getJSONPretty("report"));
         }
     }
 
-    private static void updateMultipleAttributes() {
+    public static void updateMultipleAttributes() {
 
         Table table = dynamoDB.getTable(tableName);
 
@@ -161,7 +164,7 @@ System.out.println(item.getJSONPretty("report"));
         }
     }
 
-    private static void updateExistingAttributeConditionally() {
+    public static void updateExistingAttributeConditionally() {
 
         Table table = dynamoDB.getTable(tableName);
 
@@ -188,7 +191,7 @@ System.out.println(item.getJSONPretty("report"));
         }
     }
 
-    private static void deleteItem() {
+    public static void deleteItem() {
 
         Table table = dynamoDB.getTable(tableName);
 
