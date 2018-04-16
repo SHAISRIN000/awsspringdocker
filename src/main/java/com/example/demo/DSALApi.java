@@ -55,14 +55,18 @@ public class DSALApi {
 	}
 	
   @RequestMapping(value = "/{id}/propertydata", method = RequestMethod.GET)
-    public ResponseEntity<?> retrievePropertyData(@PathVariable("id") long id) {
+    public ResponseEntity<?> retrievePropertyData(@PathVariable("id") String id) {
         System.out.println("Fetching report with id {}"+id);
-        PropertyData data=ModelUtil.getData();
+        String rawReport= DocumentAPIItemCRUDExample.retrieveItem(id);
+        //4c6a2cf3-5439-47aa-b2d9-60773b58eb65
+        
+        /*PropertyData data=ModelUtil.getData();
         if (data == null) {
         	 System.out.println("Report with id {} not found."+id);
             return new ResponseEntity("Report No found", HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<PropertyData>(data, HttpStatus.OK);
+        }*/
+        return new ResponseEntity<String>(rawReport, HttpStatus.OK);
+        //return new ResponseEntity<PropertyData>(data, HttpStatus.OK);
     }
 	
   @RequestMapping(value = "/property", method = RequestMethod.GET)
@@ -108,6 +112,7 @@ public class DSALApi {
 		e.printStackTrace();
 	}
 	  
+	  DocumentAPIItemCRUDExample.createItems(dsalJSONstr);
 	  //PropertyData data=ModelUtil.getData();
 	  data.setAddress(address);
 	  data.getElements().add(numberofstories);
