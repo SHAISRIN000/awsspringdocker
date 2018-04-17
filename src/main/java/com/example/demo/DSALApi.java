@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
@@ -31,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.model.Address;
 import com.example.demo.model.DataElements;
+import com.example.demo.model.Mapper;
 import com.example.demo.model.ModelUtil;
 import com.example.demo.model.PropertyData;
 
@@ -57,7 +59,7 @@ public class DSALApi {
   @RequestMapping(value = "/{id}/propertydata", method = RequestMethod.GET)
     public ResponseEntity<?> retrievePropertyData(@PathVariable("id") String id) {
         System.out.println("Fetching report with id {}"+id);
-        String rawReport= DocumentAPIItemCRUDExample.retrieveItem(id);
+        PropertyData data= DynamoDBClient.getReport(id);
         //4c6a2cf3-5439-47aa-b2d9-60773b58eb65
         
         /*PropertyData data=ModelUtil.getData();
@@ -65,9 +67,28 @@ public class DSALApi {
         	 System.out.println("Report with id {} not found."+id);
             return new ResponseEntity("Report No found", HttpStatus.NOT_FOUND);
         }*/
-        return new ResponseEntity<String>(rawReport, HttpStatus.OK);
+        return new ResponseEntity<PropertyData>(data, HttpStatus.OK);
         //return new ResponseEntity<PropertyData>(data, HttpStatus.OK);
     }
+  
+  
+  
+  @RequestMapping(value = "/{id}/propertyRawData", method = RequestMethod.GET)
+  public ResponseEntity<?> retrievePropertyRawData(@PathVariable("id") String id) {
+      System.out.println("Fetching report with id {}"+id);
+      String data= DynamoDBClient.retrieveRawReport(id);
+      //4c6a2cf3-5439-47aa-b2d9-60773b58eb65
+      
+      /*PropertyData data=ModelUtil.getData();
+      if (data == null) {
+      	 System.out.println("Report with id {} not found."+id);
+          return new ResponseEntity("Report No found", HttpStatus.NOT_FOUND);
+      }*/
+      return new ResponseEntity<String>(data, HttpStatus.OK);
+      //return new ResponseEntity<PropertyData>(data, HttpStatus.OK);
+  }
+  
+  
 	
   @RequestMapping(value = "/property", method = RequestMethod.GET)
   public ResponseEntity<?> getPropertyData(@RequestParam("address") String Stringaddress) {
@@ -96,27 +117,21 @@ public class DSALApi {
 	 // Object dsalJSON =  restTemplate.getForObject("http://localhost:8080/sampleresponse.json", Object.class);
 	  String dsalJSONstr =  restTemplate.getForObject("http://localhost:8080/sampleresponse.json", String.class);
 		
-	  //HashMap<String, String> passedValues = (HashMap<String, String>)dsalJSON;
-	  DataElements numberofstories=null;
+	  DynamoDBClient.createRawReport(dsalJSONstr,address1);
+	  
 	  try {
-		JsonNode rootNode = mapper.readTree(dsalJSONstr);
-		
-		JsonNode numberStoriesInferenceNode=rootNode.get("numberStoriesInference");
-		System.out.println(numberStoriesInferenceNode.get("confidence"));
-		numberStoriesInferenceNode.get("inputUrl");
-		numberStoriesInferenceNode.get("numberStories");
-		 numberofstories=new DataElements("numberOfStories",numberStoriesInferenceNode.get("numberStories").asText(),numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence").asText());
-		System.out.println("Print..."+numberofstories.toString());
-	} catch (IOException e) {
+		data=Mapper.translate(dsalJSONstr, address1);
+	} catch (JsonProcessingException e1) {
 		// TODO Auto-generated catch block
-		e.printStackTrace();
+		e1.printStackTrace();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
 	}
 	  
-	  DocumentAPIItemCRUDExample.createItems(dsalJSONstr);
-	  //PropertyData data=ModelUtil.getData();
-	  data.setAddress(address);
-	  data.getElements().add(numberofstories);
-      if (data == null) {
+	  DynamoDBClient.createReport(data);
+
+	  if (data == null) {
       	 System.out.println("DSAL report Error.");
           return new ResponseEntity("DSAL Report No found", HttpStatus.NOT_FOUND);
       }

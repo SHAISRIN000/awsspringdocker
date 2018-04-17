@@ -37,7 +37,7 @@ import com.example.demo.model.PropertyData;
 import com.example.demo.model.PropertyDataClone;
 
 
-public class DocumentAPIItemCRUDExample {
+public class DynamoDBClient {
 
  static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
  static DynamoDB dynamoDB = new DynamoDB(client);
@@ -51,7 +51,7 @@ public class DocumentAPIItemCRUDExample {
 
   //   retrieveItem("4c6a2cf3-5439-47aa-b2d9-60773b58eb65");
 	 
-	 PropertyDataClone data=new PropertyDataClone();
+	 PropertyData data=new PropertyData();
 	 data.setRequestor("test");
 	 data.setSource("DSAL");
 	 data.setCreateTS(new Timestamp(System.currentTimeMillis()).toString());
@@ -75,16 +75,16 @@ public class DocumentAPIItemCRUDExample {
  }
  
  
- public static void createReport(PropertyDataClone data) {
+ public static void createReport(PropertyData data) {
 	 	Table table = dynamoDB.getTable(tableName);
 	 	String id=data.getId();
 	    DynamoDBMapper mapper = new DynamoDBMapper(client);
 	    mapper.save(data);
 	    // Retrieve the updated item.
-      DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
+  /*    DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
         PropertyDataClone updatedItem = mapper.load(PropertyDataClone.class, id, config);
         System.out.println("Retrieved the previously updated item:");
-        //System.out.println(updatedItem)
+  */      //System.out.println(updatedItem)
 	    /*
 	 	try {
 		           try {
@@ -111,12 +111,14 @@ public class DocumentAPIItemCRUDExample {
 	 }
 
  
- public static void getReport(String id) {
+ public static PropertyData getReport(String id) {
 	    DynamoDBMapper mapper = new DynamoDBMapper(client);
 	    // Retrieve the updated item.
 	    DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
-     PropertyDataClone updatedItem = mapper.load(PropertyDataClone.class, id, config);
+     PropertyData data = mapper.load(PropertyData.class, id, config);
      System.out.println("Retrieved the previously updated item:");
+     
+     return data;
      //System.out.println(updatedItem)
 	    /*
 	 	try {
@@ -142,29 +144,30 @@ public class DocumentAPIItemCRUDExample {
 	 	}*/
 	 	
 	 }
- public static void createItems(String json) {
+ public static void createRawReport(String reportJson,String request) {
  	Table table = dynamoDB.getTable(tableName);
-     
+     System.out.println("Entered in createRawReport");
  	try {
- 	JsonParser parser = new JsonFactory().createJsonParser(json);
+ /*	JsonParser parser = new JsonFactory().createJsonParser(json);
 
        JsonNode rootNode = new ObjectMapper().readTree(parser);
     
        ObjectNode currentNode;
        currentNode =(ObjectNode) rootNode;
 
-//           int year = currentNode.path("year").asInt();
+*///           int year = currentNode.path("year").asInt();
 //           String title = currentNode.path("title").asText();
 
            try {
-               table.putItem(new Item().withPrimaryKey("reportId", UUID.randomUUID().toString()).withString("report",
-                   currentNode.toString())
-         	  .withString("source", "DSAL")
- 			  .withString("requestor", "PLPC")
+               table.putItem(new Item().withPrimaryKey("reportId", UUID.randomUUID().toString())
+            	.withString("request", request)
+               .withString("report",reportJson)
+               .withString("source", "DSAL")
+ 			   .withString("requestor", "PLPC")
                .withString("createTS",new Timestamp(System.currentTimeMillis()).toString()));
                
-         	//  table.putItem(item);
-      
+System.out.println("Finished in createRawReport");
+             
            }
            catch (Exception e) {
                System.err.println("Create items failed.");
@@ -172,14 +175,14 @@ public class DocumentAPIItemCRUDExample {
 
                 }
        
-       parser.close();
+//       parser.close();
  	}catch(Exception e) {
  		System.err.println("Error in Parsing the JSON");
  	}
  	
  }
 
- public static String retrieveItem(String reportId) {
+ public static String retrieveRawReport(String reportId) {
      Table table = dynamoDB.getTable(tableName);
      String reportJson=null;
      try {

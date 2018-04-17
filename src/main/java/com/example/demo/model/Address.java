@@ -1,5 +1,9 @@
 package com.example.demo.model;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+
+@DynamoDBDocument
 public class Address {
 
 	String addressLine1;
@@ -27,30 +31,39 @@ public class Address {
 		this.city = city;
 	}
 	
+	@DynamoDBAttribute(attributeName="addressLine1")
 	public String getAddressLine1() {
 		return addressLine1;
 	}
 	public void setAddressLine1(String addressLine1) {
 		this.addressLine1 = addressLine1;
 	}
+	
+	@DynamoDBAttribute(attributeName="addressLine2")
 	public String getAddressLine2() {
 		return addressLine2;
 	}
 	public void setAddressLine2(String addressLine2) {
 		this.addressLine2 = addressLine2;
 	}
+	
+	@DynamoDBAttribute(attributeName="zip")
 	public String getZipcode() {
 		return zipcode;
 	}
 	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
+
+	@DynamoDBAttribute(attributeName="state")
 	public String getState() {
 		return state;
 	}
 	public void setState(String state) {
 		this.state = state;
 	}
+	
+	@DynamoDBAttribute(attributeName="city")
 	public String getCity() {
 		return city;
 	}
