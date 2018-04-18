@@ -1,6 +1,6 @@
 //Copyright 2012-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //Licensed under the Apache License, Version 2.0.
-package com.example.demo;
+package com.shaik.dataaggregator.db;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -32,9 +32,8 @@ import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
-import com.example.demo.model.DataElements;
-import com.example.demo.model.PropertyData;
-import com.example.demo.model.PropertyDataClone;
+import com.shaik.dataaggregator.model.DataElements;
+import com.shaik.dataaggregator.model.PropertyData;
 
 
 public class DynamoDBClient {
@@ -52,7 +51,6 @@ public class DynamoDBClient {
   //   retrieveItem("4c6a2cf3-5439-47aa-b2d9-60773b58eb65");
 	 
 	 PropertyData data=new PropertyData();
-	 data.setRequestor("test");
 	 data.setSource("DSAL");
 	 data.setCreateTS(new Timestamp(System.currentTimeMillis()).toString());
 	 data.setId(UUID.randomUUID().toString());
@@ -75,136 +73,86 @@ public class DynamoDBClient {
  }
  
  
- public static void createReport(PropertyData data) {
-	 	Table table = dynamoDB.getTable(tableName);
-	 	String id=data.getId();
-	    DynamoDBMapper mapper = new DynamoDBMapper(client);
-	    mapper.save(data);
-	    // Retrieve the updated item.
-  /*    DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
-        PropertyDataClone updatedItem = mapper.load(PropertyDataClone.class, id, config);
-        System.out.println("Retrieved the previously updated item:");
-  */      //System.out.println(updatedItem)
-	    /*
-	 	try {
-		           try {
-	               table.putItem(new Item().withPrimaryKey("reportId", UUID.randomUUID().toString()).withString("report",
-	                   currentNode.toString())
-	         	  .withString("source", "DSAL")
-	 			  .withString("requestor", "PLPC")
-	               .withString("createTS",new Timestamp(System.currentTimeMillis()).toString()));
-	               
-	         	//  table.putItem(item);
-	      
-	           }
-	           catch (Exception e) {
-	               System.err.println("Create items failed.");
-	               System.err.println(e.getMessage());
+	/**
+	 * @param data
+	 */
+	public static void createReport(PropertyData data) {
+		DynamoDBMapper mapper = new DynamoDBMapper(client);
+		mapper.save(data);
+	}
 
-	                }
-	       
-	       parser.close();
-	 	}catch(Exception e) {
-	 		System.err.println("Error in Parsing the JSON");
-	 	}*/
-	 	
-	 }
+	/**
+	 * @param request 
+	 * @param consumer
+	 * @return reportId
+	 */
+	public static String insertRequest(String request, String consumer) {
 
+		System.out.println("Entered in insertReport");
+		Table table = dynamoDB.getTable("DSAL.Request");
+		String reportId = UUID.randomUUID().toString();
+		try {
+			table.putItem(new Item().withPrimaryKey("reportId", reportId).withString("request", request)
+					.withString("consumer", consumer)
+					.withString("createTS", new Timestamp(System.currentTimeMillis()).toString()));
+
+		} catch (Exception e) {
+			System.err.println("insert Request failed.");
+			System.err.println(e.getMessage());
+		}
+		return reportId;
+	}
+	
+	
+	public static PropertyData retrieveReport(String id) {
+		DynamoDBMapper mapper = new DynamoDBMapper(client);
+		DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
+		PropertyData data = mapper.load(PropertyData.class, id, config);
+		System.out.println("Retrieved the report successfully");
+		return data;
+	}
+
+	/**
+	 * @param reportId
+	 * @param report
+	 * @param source
+	 * @param sourceId
+	 */
  
- public static PropertyData getReport(String id) {
-	    DynamoDBMapper mapper = new DynamoDBMapper(client);
-	    // Retrieve the updated item.
-	    DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
-     PropertyData data = mapper.load(PropertyData.class, id, config);
-     System.out.println("Retrieved the previously updated item:");
-     
-     return data;
-     //System.out.println(updatedItem)
-	    /*
-	 	try {
-		           try {
-	               table.putItem(new Item().withPrimaryKey("reportId", UUID.randomUUID().toString()).withString("report",
-	                   currentNode.toString())
-	         	  .withString("source", "DSAL")
-	 			  .withString("requestor", "PLPC")
-	               .withString("createTS",new Timestamp(System.currentTimeMillis()).toString()));
-	               
-	         	//  table.putItem(item);
-	      
-	           }
-	           catch (Exception e) {
-	               System.err.println("Create items failed.");
-	               System.err.println(e.getMessage());
+	public static void insertRawReport(String reportId, String report, String source, String sourceId) {
+		Table table = dynamoDB.getTable("DSAL.RawReport");
+		System.out.println("Entered in insertRawReport");
+		try {
+			table.putItem(new Item().withPrimaryKey("reportId", reportId).withString("report", report)
+					.withString("source", source)
+					.withString("sourceCorrelationId", sourceId)
+					.withString("createTS", new Timestamp(System.currentTimeMillis()).toString()));
+		} catch (Exception e) {
+			System.err.println("Create items failed.");
+			System.err.println(e.getMessage());
+		}
+		System.out.println("Finished in createRawReport");
 
-	                }
-	       
-	       parser.close();
-	 	}catch(Exception e) {
-	 		System.err.println("Error in Parsing the JSON");
-	 	}*/
-	 	
-	 }
- public static void createRawReport(String reportJson,String request) {
- 	Table table = dynamoDB.getTable(tableName);
-     System.out.println("Entered in createRawReport");
- 	try {
- /*	JsonParser parser = new JsonFactory().createJsonParser(json);
+	}
 
-       JsonNode rootNode = new ObjectMapper().readTree(parser);
-    
-       ObjectNode currentNode;
-       currentNode =(ObjectNode) rootNode;
+	public static String retrieveRawReport(String reportId) {
+		Table table = dynamoDB.getTable(tableName);
+		String reportJson = null;
+		try {
 
-*///           int year = currentNode.path("year").asInt();
-//           String title = currentNode.path("title").asText();
-
-           try {
-               table.putItem(new Item().withPrimaryKey("reportId", UUID.randomUUID().toString())
-            	.withString("request", request)
-               .withString("report",reportJson)
-               .withString("source", "DSAL")
- 			   .withString("requestor", "PLPC")
-               .withString("createTS",new Timestamp(System.currentTimeMillis()).toString()));
-               
-System.out.println("Finished in createRawReport");
-             
-           }
-           catch (Exception e) {
-               System.err.println("Create items failed.");
-               System.err.println(e.getMessage());
-
-                }
-       
-//       parser.close();
- 	}catch(Exception e) {
- 		System.err.println("Error in Parsing the JSON");
- 	}
- 	
- }
-
- public static String retrieveRawReport(String reportId) {
-     Table table = dynamoDB.getTable(tableName);
-     String reportJson=null;
-     try {
-
-     	  GetItemSpec spec = new GetItemSpec().withPrimaryKey("reportId", reportId);
-     	  Item item = table.getItem(spec);
-           
-System.out.println(item.getJSONPretty("report"));
-//         Item item = table.getItem("reportId", 100, "reportId, report, requestor, source", null);
-
-         System.out.println("Printing item after retrieving it....");
-         System.out.println(item.toJSONPretty());
-         reportJson= item.toJSONPretty();
-
-     }
-     catch (Exception e) {
-         System.err.println("GetItem failed.");
-         System.err.println(e.getMessage());
-     }
-     return reportJson;
-
- }
+			GetItemSpec spec = new GetItemSpec().withPrimaryKey("reportId", reportId);
+			Item item = table.getItem(spec);
+			System.out.println(item.getJSONPretty("report"));
+			System.out.println("Printing item after retrieving it....");
+			reportJson = item.toJSONPretty();
+		} catch (Exception e) {
+			System.err.println("retrieveRawReport failed.");
+			System.err.println(e.getMessage());
+		}
+		return reportJson;
+	}
+	
+	
 
  public static void updateAddNewAttribute() {
      Table table = dynamoDB.getTable(tableName);

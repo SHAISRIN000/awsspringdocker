@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.shaik.dataaggregator.model;
 
 import java.util.ArrayList;
 import java.util.List;

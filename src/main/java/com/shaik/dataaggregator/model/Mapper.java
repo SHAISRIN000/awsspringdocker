@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.shaik.dataaggregator.model;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,12 +31,6 @@ public class Mapper {
 	       elements.add(fetchNumberOfStories(response));
 	       elements.add(fetchNumberOfChimneys(response));
 	       data.setElements(elements);
-	       Address address=convertAddress(request);
-	       data.setAddress(address);
-	       data.setId(UUID.randomUUID().toString());
-	       data.setRequestor("PC");
-	       data.setSource("PropertyVision");
-	       System.out.println("Successfully created propertyData");
 	       return data;
 	}
 	

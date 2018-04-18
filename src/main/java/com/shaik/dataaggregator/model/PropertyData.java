@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.shaik.dataaggregator.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,8 @@ public class PropertyData {
 	List<DataElements> elements=new ArrayList<>();
 	String source;
 	String createTS;
-	String requestor;
 	
-	@DynamoDBAttribute(attributeName="address")
+	@DynamoDBIgnore
 	public Address getAddress() {
 		return address;
 	}
@@ -68,22 +67,12 @@ public class PropertyData {
 	}
 	
 	@DynamoDBAttribute(attributeName="createTS")  
-
 	public String getCreateTS() {
 		return createTS;
 	}
 
 	public void setCreateTS(String createTS) {
 		this.createTS = createTS;
-	}
-
-	@DynamoDBAttribute(attributeName="requestor")  
-	public String getRequestor() {
-		return requestor;
-	}
-
-	public void setRequestor(String requestor) {
-		this.requestor = requestor;
 	}
 
 	@Override
