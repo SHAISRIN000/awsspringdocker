@@ -119,6 +119,8 @@ public class DataAggregatorApi {
 	  OAuth2AccessToken token=restTemplate.getAccessToken();
 		System.out.println("Oauth Token"+token.getValue());
 		System.out.println("Expires"+token.getExpiresIn());
+	    String str=restTemplate.getForObject("https://api.property.vision/property?address=3142+Lindbergh+St+Madison+WI+53704", String.class);
+		System.out.println(str);	  
 		
 	  //pingType indicates None or Component
 	  
