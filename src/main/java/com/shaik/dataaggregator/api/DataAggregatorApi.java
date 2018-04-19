@@ -108,9 +108,27 @@ public class DataAggregatorApi {
   }
   
   @RequestMapping(value = "/ping", method = RequestMethod.GET)
+<<<<<<< .mine
   public ResponseEntity<?> getPing(@RequestParam(name="type",required=false) String pingType) {
 	 	String str=getRestTemplate().getForObject("https://api.property.vision/property?address=3142+Lindbergh+St+Madison+WI+53704", String.class);
 		System.out.println(str);	  
+
+
+
+
+
+
+=======
+  public ResponseEntity<?> getPing(@RequestParam("type") String pingType) {
+	  OAuth2AccessToken token=restTemplate.getAccessToken();
+		System.out.println("Oauth Token"+token.getValue());
+		System.out.println("Expires"+token.getExpiresIn());
+	    String str=restTemplate.getForObject("https://api.property.vision/property?address=3142+Lindbergh+St+Madison+WI+53704", String.class);
+		System.out.println(str);	  
+		
+	  //pingType indicates None or Component
+	  
+>>>>>>> .theirs
 	  return new ResponseEntity<String>("success", HttpStatus.OK);
   }
 
