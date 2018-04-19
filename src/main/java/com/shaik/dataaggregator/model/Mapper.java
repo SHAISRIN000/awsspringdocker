@@ -16,16 +16,26 @@ import org.codehaus.jackson.node.ObjectNode;
 
 public class Mapper {
 
-	public static PropertyData translate(String response,String request) throws JsonProcessingException, IOException   {
-			JsonParser parser = new JsonFactory().createJsonParser(response);
-			System.out.println("Started translate");
-	System.out.println("Started translate");
-
-	       JsonNode rootNode = new ObjectMapper().readTree(parser);
-	    
+	public static PropertyData translate(String request,Report report) throws JsonProcessingException, IOException   {
+			JsonParser parser = new JsonFactory().createJsonParser(request);
+		   JsonNode rootNode = new ObjectMapper().readTree(parser);
+	      String source="PropertyVision";
 	       ObjectNode currentNode;
 	       currentNode =(ObjectNode) rootNode;
+	        
+	       
+	       
+	        JsonNode numberStoriesInferenceNode=rootNode.get("numberStoriesInference");
+	        
+	    	ElementInference numberofstories=new ElementInference("numberOfStories",numberStoriesInferenceNode.get("numberStories").asText(),numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence").asText(),numberStoriesInferenceNode.get("modelVersion").asText(),source);
+		
+	        JsonNode numberofChimneysInferenceNode=rootNode.get("numberChimneysInference");
+		    ElementInference numberofChimneys=new ElementInference("num_chimneys",numberStoriesInferenceNode.get("num_chimneys")!=null?numberStoriesInferenceNode.get("num_chimneys").asText():"0",numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence")!=null?numberStoriesInferenceNode.get("confidence").asText():"0",numberStoriesInferenceNode.get("modelVersion").asText(),source););
 
+		    JsonNode poolsInferenceNode=rootNode.get("poolsInference");
+		    ElementInference poolss=new ElementInference("pools",poolsInferenceNode.get("pools")!=null?poolsInferenceNode.get("pools").asText():"0",poolsInferenceNode.get("inputUrl").asText(),poolsInferenceNode.get("confidence")!=null?poolsInferenceNode.get("confidence").asText():"0",poolsInferenceNode.get("modelVersion").asText(),source);
+
+		    
 	       PropertyData data=new PropertyData();
 	       List<ElementInference> elements=new ArrayList<>();
 	       elements.add(fetchNumberOfStories(response));
@@ -53,8 +63,8 @@ public class Mapper {
 		System.out.println(numberStoriesInferenceNode.get("confidence"));
 		numberStoriesInferenceNode.get("inputUrl");
 		numberStoriesInferenceNode.get("numberStories");
-		ElementInference numberofstories=new ElementInference("numberOfStories",numberStoriesInferenceNode.get("numberStories").asText(),numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence").asText());
-	
+		//ElementInference numberofstories=new ElementInference("numberOfStories",numberStoriesInferenceNode.get("numberStories").asText(),numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence").asText());
+		ElementInference numberofstories=null;
 		 return numberofstories;
 	}
 	
@@ -63,7 +73,8 @@ public class Mapper {
 	   ObjectMapper mapper=new ObjectMapper();
 	   JsonNode rootNode = mapper.readTree(dsalJSONstr);
 	   JsonNode numberStoriesInferenceNode=rootNode.get("numberChimneysInference");
-	   ElementInference numberofChimneys=new ElementInference("num_chimneys",numberStoriesInferenceNode.get("num_chimneys")!=null?numberStoriesInferenceNode.get("num_chimneys").asText():"0",numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence")!=null?numberStoriesInferenceNode.get("confidence").asText():"0");
-	   return numberofChimneys;
+	   ElementInference numberofChimneys;
+	   //ElementInference numberofChimneys=new ElementInference("num_chimneys",numberStoriesInferenceNode.get("num_chimneys")!=null?numberStoriesInferenceNode.get("num_chimneys").asText():"0",numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence")!=null?numberStoriesInferenceNode.get("confidence").asText():"0");
+	   return numberofChimneys=null;
 	}
 }
