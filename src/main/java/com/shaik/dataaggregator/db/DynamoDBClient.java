@@ -32,8 +32,10 @@ import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
-import com.shaik.dataaggregator.model.DataElements;
+import com.shaik.dataaggregator.model.ElementInference;
+import com.shaik.dataaggregator.model.ModelUtil;
 import com.shaik.dataaggregator.model.PropertyData;
+import com.shaik.dataaggregator.model.Report;
 
 
 public class DynamoDBClient {
@@ -45,12 +47,16 @@ public class DynamoDBClient {
  static String tableName = "DSAL.RawReport";
 
  public static void main(String[] args) throws IOException {
+	 
+	// updateRequestStatus("780800ab-201d-43c3-86e4-cc9c0a960bfd","completed1");
+	 Report r=ModelUtil.createReport();
+	 createReport(r);
 
      //createItems(null);
 
   //   retrieveItem("4c6a2cf3-5439-47aa-b2d9-60773b58eb65");
 	 
-	 PropertyData data=new PropertyData();
+	/* PropertyData data=new PropertyData();
 	 data.setSource("DSAL");
 	 data.setCreateTS(new Timestamp(System.currentTimeMillis()).toString());
 	 data.setId(UUID.randomUUID().toString());
@@ -59,7 +65,7 @@ public class DynamoDBClient {
 	 dataElements.add(new DataElements("area", "40", "imageArea","30"));
 	 dataElements.add(new DataElements("attic", "50", "imageAttic","30"));
 	 data.setElements(dataElements);
-	 createReport(data);
+	 createReport(data);*/
 	 
 	 
      // Perform various updates.
@@ -76,9 +82,9 @@ public class DynamoDBClient {
 	/**
 	 * @param data
 	 */
-	public static void createReport(PropertyData data) {
+	public static void createReport(Report r) {
 		DynamoDBMapper mapper = new DynamoDBMapper(client);
-		mapper.save(data);
+		mapper.save(r);
 	}
 
 	/**
@@ -94,6 +100,8 @@ public class DynamoDBClient {
 		try {
 			table.putItem(new Item().withPrimaryKey("reportId", reportId).withString("request", request)
 					.withString("consumer", consumer)
+					.withString("user", "XXXX")
+					.withString("status", "InProcess")
 					.withString("createTS", new Timestamp(System.currentTimeMillis()).toString()));
 
 		} catch (Exception e) {
@@ -103,6 +111,34 @@ public class DynamoDBClient {
 		return reportId;
 	}
 	
+	public static void updateRequestStatus(String id, String status) {
+		
+		  Table table1 = dynamoDB.getTable("DSAL.Request");
+		  System.out.println("Enetering updateRequestStatus item after multiple attribute update...");
+		   
+		  UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("reportId", id)
+		    		 											 .withUpdateExpression("set status1 = :val1, updatedTS =:val2")
+		    		 											 .withValueMap(new ValueMap()
+		    		 											         .withString(":val1", status).withString(":val2",  new Timestamp(System.currentTimeMillis()).toString()));
+		    	       
+		    		 
+		     try {
+
+		         UpdateItemOutcome outcome = table1.updateItem(updateItemSpec);
+
+		         // Check the response.
+		         System.out.println("Printing item after multiple attribute update...");
+		         System.out.println(outcome.getItem().toJSONPretty());
+
+		     }
+		     catch (Exception e) {
+		         System.err.println("Failed to update multiple attributes in " + tableName);
+		         System.err.println(e.getMessage());
+
+		     }
+
+	}
+
 	
 	public static PropertyData retrieveReport(String id) {
 		DynamoDBMapper mapper = new DynamoDBMapper(client);
@@ -176,18 +212,18 @@ public class DynamoDBClient {
      }
  }
 
- public static void updateMultipleAttributes() {
+ public static void updateMultipleAttributes(String id,String status) {
 
-     Table table = dynamoDB.getTable(tableName);
+     Table table = dynamoDB.getTable("DSAL.RawReport");
 
+     
+     UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("reportId", id)
+    		 											 .withUpdateExpression("set #status=:val1 set#UpdatedTS=:val2")
+    		 											 .withValueMap(new ValueMap()
+    		 											         .withString(":val1", status).withString(":val2",  new Timestamp(System.currentTimeMillis()).toString()));
+    	       
+    		 
      try {
-
-         UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("Id", 120)
-             .withUpdateExpression("add #a :val1 set #na=:val2")
-             .withNameMap(new NameMap().with("#a", "Authors").with("#na", "NewAttribute"))
-             .withValueMap(
-                 new ValueMap().withStringSet(":val1", "Author YY", "Author ZZ").withString(":val2", "someValue"))
-             .withReturnValues(ReturnValue.ALL_NEW);
 
          UpdateItemOutcome outcome = table.updateItem(updateItemSpec);
 

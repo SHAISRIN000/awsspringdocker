@@ -27,7 +27,7 @@ public class Mapper {
 	       currentNode =(ObjectNode) rootNode;
 
 	       PropertyData data=new PropertyData();
-	       List<DataElements> elements=new ArrayList<>();
+	       List<ElementInference> elements=new ArrayList<>();
 	       elements.add(fetchNumberOfStories(response));
 	       elements.add(fetchNumberOfChimneys(response));
 	       data.setElements(elements);
@@ -46,24 +46,24 @@ public class Mapper {
 			
 	}
 	
-	private static DataElements fetchNumberOfStories(String dsalJSONstr) throws JsonProcessingException, IOException {
+	private static ElementInference fetchNumberOfStories(String dsalJSONstr) throws JsonProcessingException, IOException {
 	   ObjectMapper mapper=new ObjectMapper();
 	   JsonNode rootNode = mapper.readTree(dsalJSONstr);
 		JsonNode numberStoriesInferenceNode=rootNode.get("numberStoriesInference");
 		System.out.println(numberStoriesInferenceNode.get("confidence"));
 		numberStoriesInferenceNode.get("inputUrl");
 		numberStoriesInferenceNode.get("numberStories");
-		DataElements numberofstories=new DataElements("numberOfStories",numberStoriesInferenceNode.get("numberStories").asText(),numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence").asText());
+		ElementInference numberofstories=new ElementInference("numberOfStories",numberStoriesInferenceNode.get("numberStories").asText(),numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence").asText());
 	
 		 return numberofstories;
 	}
 	
 	
-	private static DataElements fetchNumberOfChimneys(String dsalJSONstr) throws JsonProcessingException, IOException {
+	private static ElementInference fetchNumberOfChimneys(String dsalJSONstr) throws JsonProcessingException, IOException {
 	   ObjectMapper mapper=new ObjectMapper();
 	   JsonNode rootNode = mapper.readTree(dsalJSONstr);
 	   JsonNode numberStoriesInferenceNode=rootNode.get("numberChimneysInference");
-	   DataElements numberofChimneys=new DataElements("num_chimneys",numberStoriesInferenceNode.get("num_chimneys")!=null?numberStoriesInferenceNode.get("num_chimneys").asText():"0",numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence")!=null?numberStoriesInferenceNode.get("confidence").asText():"0");
+	   ElementInference numberofChimneys=new ElementInference("num_chimneys",numberStoriesInferenceNode.get("num_chimneys")!=null?numberStoriesInferenceNode.get("num_chimneys").asText():"0",numberStoriesInferenceNode.get("inputUrl").asText(),numberStoriesInferenceNode.get("confidence")!=null?numberStoriesInferenceNode.get("confidence").asText():"0");
 	   return numberofChimneys;
 	}
 }

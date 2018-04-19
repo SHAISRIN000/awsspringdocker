@@ -22,8 +22,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 @EnableWebSecurity
 public class DsalRestApplication extends WebSecurityConfigurerAdapter{
 
-	@Value("${application.externalAccessUrl}")
-	String externalAccessUrl="";
+	@Value("${application.accessTokenUri}")
+	String accessTokenUri="";
 	
 	@Value("${application.clientId}")
 	String clientId="";
@@ -40,10 +40,9 @@ public class DsalRestApplication extends WebSecurityConfigurerAdapter{
 	@Bean
 	public OAuth2ProtectedResourceDetails resource() {
 		ClientCredentialsResourceDetails resource=new ClientCredentialsResourceDetails();
-		resource.setClientAuthenticationScheme(AuthenticationScheme.form);
 		resource.setClientId(clientId);
 		resource.setClientSecret(clientSecret);
-		resource.setAccessTokenUri(externalAccessUrl+"/pcmsrest/oauth/token");
+		resource.setAccessTokenUri(accessTokenUri);
 		return resource;
 		
 	}

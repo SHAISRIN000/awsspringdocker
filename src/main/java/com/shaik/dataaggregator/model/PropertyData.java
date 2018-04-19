@@ -11,17 +11,17 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 @DynamoDBTable(tableName="DSAL.Report")
 public class PropertyData {
 	public String id;
-	Address address;
-	List<DataElements> elements=new ArrayList<>();
+	String address;
+	List<ElementInference> elements=new ArrayList<>();
 	String source;
 	String createTS;
 	
 	@DynamoDBIgnore
-	public Address getAddress() {
+	public String getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(String address) {
 		this.address = address;
 	}
 
@@ -32,8 +32,8 @@ public class PropertyData {
 		super();
 	}
 	
-	public PropertyData(Address address,List<DataElements> elements){
-	this.address=address;
+	public PropertyData(String address,List<ElementInference> elements){
+	    this.address=address;
 		this.elements=elements;
 	}
 	
@@ -49,10 +49,10 @@ public class PropertyData {
 	
 
 	@DynamoDBAttribute(attributeName="report")  
-	public List<DataElements> getElements() {
+	public List<ElementInference> getElements() {
 		return elements;
 	}
-	public void setElements(List<DataElements> elements) {
+	public void setElements(List<ElementInference> elements) {
 		this.elements = elements;
 	}
 	
