@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.assertj.core.util.Arrays;
 
 public class ModelUtil {
 
