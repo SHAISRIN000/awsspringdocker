@@ -34,7 +34,7 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 import com.shaik.dataaggregator.model.ElementInference;
 import com.shaik.dataaggregator.model.ModelUtil;
-import com.shaik.dataaggregator.model.PropertyData;
+
 import com.shaik.dataaggregator.model.Report;
 
 
@@ -114,8 +114,7 @@ public class DynamoDBClient {
 	public static void updateRequestStatus(String id, String status) {
 		
 		  Table table1 = dynamoDB.getTable("DSAL.Request");
-		  System.out.println("Enetering updateRequestStatus item after multiple attribute update...");
-		   
+		  System.out.println("Enetering updateRequestStatus");
 		  UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("reportId", id)
 		    		 											 .withUpdateExpression("set status1 = :val1, updatedTS =:val2")
 		    		 											 .withValueMap(new ValueMap()
@@ -124,15 +123,10 @@ public class DynamoDBClient {
 		    		 
 		     try {
 
-		         UpdateItemOutcome outcome = table1.updateItem(updateItemSpec);
-
-		         // Check the response.
-		         System.out.println("Printing item after multiple attribute update...");
-		         System.out.println(outcome.getItem().toJSONPretty());
-
+		         table1.updateItem(updateItemSpec);
 		     }
 		     catch (Exception e) {
-		         System.err.println("Failed to update multiple attributes in " + tableName);
+		         System.err.println("Failed to update updateRequestStatus " + table1.getTableName());
 		         System.err.println(e.getMessage());
 
 		     }
@@ -140,10 +134,10 @@ public class DynamoDBClient {
 	}
 
 	
-	public static PropertyData retrieveReport(String id) {
+	public static Report retrieveReport(String id) {
 		DynamoDBMapper mapper = new DynamoDBMapper(client);
 		DynamoDBMapperConfig config = new DynamoDBMapperConfig(DynamoDBMapperConfig.ConsistentReads.CONSISTENT);
-		PropertyData data = mapper.load(PropertyData.class, id, config);
+		Report data = mapper.load(Report.class, id, config);
 		System.out.println("Retrieved the report successfully");
 		return data;
 	}
