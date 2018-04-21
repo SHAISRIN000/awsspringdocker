@@ -51,3 +51,6 @@ cp /home/ec2-user/environment/target/DSALRest-0.0.1-SNAPSHOT.jar .
 
 Setting up the AWS access 
 https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html
+
+AWS credentials on container
+docker container run -it -e AWS_ACCESS_KEY_ID=XXX -e AWS_SECRET_ACCESS_KEY=XXX -p 8080:8080 sshaik/dsalv2
