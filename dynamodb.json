@@ -1,0 +1,249 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "5bdb01ae-ea54-4370-8b77-5d897a07ab70": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 357.9999694824219,
+                    "y": 135.99999237060547
+                },
+                "z": 0
+            }
+        }
+    },
+    "Resources": {
+        "Error": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "RequestID",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "ErrorMessage",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "ErrorLog",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "CreatedTS",
+                        "AttributeType": "N"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "RequestID",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": "PDA.Error"
+            }
+        },
+       "Status": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "RequestID",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "ReportID",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Status",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "CreatedTS",
+                        "AttributeType": "N"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "RequestID",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": "PDA.Status",
+				"GlobalSecondaryIndexes" : [{
+					"IndexName" : "reportIdIndex",
+					"KeySchema" : [
+						{
+						  "AttributeName" : "ReportID",
+						  "KeyType" : "HASH"
+						}
+					],                         
+					"Projection" : {
+					"NonKeyAttributes" : ["RequestID","Status"],
+					"ProjectionType" : "INCLUDE"
+				  },
+				"ProvisionedThroughput" : {
+					"ReadCapacityUnits" : "5",
+					"WriteCapacityUnits" : "5"
+				  }
+				}]
+            }
+        },
+       "Request": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "RequestID",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Consumer",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "UserID",
+                        "AttributeType": "S"
+                    },
+					{
+                        "AttributeName": "Request",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "CreatedTS",
+                        "AttributeType": "N"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "RequestID",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": "PDA.Request",
+				 "GlobalSecondaryIndexes" : [{
+					"IndexName" : "reportIdIndex",
+					"KeySchema" : [
+						{
+						  "AttributeName" : "UserID",
+						  "KeyType" : "HASH"
+						}
+					],                         
+				  "Projection" : {
+					"NonKeyAttributes" : ["RequestID"],
+					"ProjectionType" : "INCLUDE"
+				  },
+				  "ProvisionedThroughput" : {
+					"ReadCapacityUnits" : "5",
+					"WriteCapacityUnits" : "5"
+				  }
+				}]
+            }
+        },
+       "VendorReport": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "ReportID",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Report",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "VendorID",
+                        "AttributeType": "S"
+                    },
+					{
+                        "AttributeName": "Vendor",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "CreatedTS",
+                        "AttributeType": "N"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "ReportID",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": "PDA.VedorReport",
+				 "GlobalSecondaryIndexes" : [{
+					"IndexName" : "reportIdIndex",
+					"KeySchema" : [
+						{
+						  "AttributeName" : "VendorID",
+						  "KeyType" : "HASH"
+						}
+					],                         
+				  "Projection" : {
+					"NonKeyAttributes" : ["ReportID"],
+					"ProjectionType" : "INCLUDE"
+				  },
+				  "ProvisionedThroughput" : {
+					"ReadCapacityUnits" : "5",
+					"WriteCapacityUnits" : "5"
+				  }
+				}]
+            }
+        },
+      "PDAReport": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "ReportID",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Report",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Vendors",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "CreatedTS",
+                        "AttributeType": "N"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "ReportID",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                }
+            }
+        }
+    }
+}
+
