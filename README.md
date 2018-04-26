@@ -54,3 +54,10 @@ https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.ht
 
 AWS credentials on container
 docker container run -it -e AWS_ACCESS_KEY_ID=XXX -e AWS_SECRET_ACCESS_KEY=XXX -p 8080:8080 sshaik/dsalv2
+
+
+localstack installation
+On windows the localstack is not working so do this.
+
+cd C:\Users\SOHA\AppData\Local\Programs\Python\Python36-32\Scripts
+py localstack start
