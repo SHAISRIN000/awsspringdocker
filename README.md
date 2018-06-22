@@ -71,3 +71,6 @@ yum groupinstall "Development Libraries"
 pip install --user localstack
 
 install npm without sudo
+
+DEBUG=1 localstack start
+
